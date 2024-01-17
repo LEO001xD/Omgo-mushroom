@@ -1,3 +1,4 @@
+
 #define BLYNK_TEMPLATE_ID "TMPL6N_-7GvRl"
 #define BLYNK_TEMPLATE_NAME "Quickstart Template"
 #define BLYNK_AUTH_TOKEN "..................."
@@ -37,21 +38,6 @@ void lcd() {
   //LINE.notifyPicture("สวัสดีวันอังคาร","https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjT21_Z_eLPyjFuRQDzJiN9hGFsRHeatpgeDj47T93t93MV3BvROSx6c4Tku-dWEKFaVadWRSWHl9MPEo3ErxqoTv9fT4jHt8v8CZ4aXVfCL86oBroodOgN3xciMB8ffO_y7T-Ob2TUj-AxcWsDPcnmxnRFNUiKZqgOO5H3Gcp3A5W3taHgoBFoL63cUg/s2093/1684132556354.jpg");
   //LINE.notifyPicture("uto kawaii","https://cdn.discordapp.com/attachments/1138409352777175150/1188863197151776828/GBOOGKHawAALsGz.jfif?ex=659c1222&is=65899d22&hm=4fff9989b9c2c766ddf79ba549247abfa939ae32417bf16259d9f0b76512031c&");
 }
-
-void lcd() {//lcd show soi mois,temp
-
-  lcd.setCursor(0, 0);
-  lcd.print("Moisture : "); 
-  lcd.print(misture);o
-  lcd.print("        "); 
-  delay(100);
-  lcd.setCursor(0, 1);
-  lcd.print("Temperature : "); // dht ยังไม่เขียน
-  lcd.print(temperature);// dht ยังไม่เขียน
-  lcd.print("        "); 
-  delay(100);
-
-}
 void DHT() { //อุณหภูมิในอากาศ เขียนไม่เป็น
   //dht
   float temperature = dht.readTemperature();
@@ -84,9 +70,20 @@ void water() {//ดูว่าน้ำจะหมดไหม
   }
 }
 void loop() {
-  lcd();
   DHT();
   soi_moisture_and_rod_nam();
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Moisture : "); 
+  lcd.print(moisture);
+  lcd.print("        "); 
+  delay(100);
+  lcd.setCursor(0, 1);
+  lcd.print("Temperature : "); // dht ยังไม่เขียน
+  lcd.print(temperature);// dht ยังไม่เขียน
+  lcd.print("        "); 
+  delay(100);
+
   water();
   delay(100);
   Blynk.run();
