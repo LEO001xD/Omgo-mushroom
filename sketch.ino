@@ -13,7 +13,7 @@
 #define DHTPIN 15   // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT sensor type
 DHT dht(DHTPIN, DHTTYPE);
-#define SOI_PIN 4
+#define SOIL_PIN 4
 
 #define SSID "Wokwi-GUEST"               
 #define PASSWORD ""                      
@@ -38,11 +38,10 @@ void lcd() {
   //LINE.notifyPicture("uto kawaii","https://cdn.discordapp.com/attachments/1138409352777175150/1188863197151776828/GBOOGKHawAALsGz.jfif?ex=659c1222&is=65899d22&hm=4fff9989b9c2c766ddf79ba549247abfa939ae32417bf16259d9f0b76512031c&");
 }
 
-void lcd() {//lcd show soi mois,temp
-
+void updateLcd(int moisture) {//lcd show soil moisture,temp
   lcd.setCursor(0, 0);
   lcd.print("Moisture : "); 
-  lcd.print(misture);o
+  lcd.print(moisture);
   lcd.print("        "); 
   delay(100);
   lcd.setCursor(0, 1);
@@ -50,44 +49,54 @@ void lcd() {//lcd show soi mois,temp
   lcd.print(temperature);// dht ยังไม่เขียน
   lcd.print("        "); 
   delay(100);
-
 }
-void DHT() { //อุณหภูมิในอากาศ เขียนไม่เป็น
-  //dht
-  float temperature = dht.readTemperature();
-  float humidity = dht.readHumidity();
+void updateBlynk(int temperature,int humidity) { //อุณหภูมิในอากาศ เขียนไม่เป็น
   char mix_temp_humi[50];
   sprintf(mix_temp_humi, "Temperature %d \n Humidity %d", temperature ,humidity);
   Blynk.virtualWrite(V2, mix_temp_humi);
-
 }
-void soi_moisture_and_rod_nam() {//ความขื้นในดิน
-  int moisture = analogRead(SOI_PIN); // read the analog value from sensor
-  Serial.print("Moisture in soi value: ");
-  Serial.println(moisture);
+void checkRodNam(int moisture) {//ความขื้นในดิน
   delay(500);
-  if(moisture<=80){
+  if (moisture <= 80) {
     digitalWrite(Relay1,HIGH);
     } 
-  else{
+  else {
     digitalWrite(Relay1,LOW);
-    } 
+    }
   }
-void water() {//ดูว่าน้ำจะหมดไหม
-  int distance = hc.dist();
-  if (distance <= 20){
+void checkWater(int waterLevel) {//ดูว่าน้ำจะหมดไหม
+  if (waterLevel <= 20){
+    // น้ำหมด
     LINE.notify("เติมน้ำ");
     Blynk.virtualWrite(V3,distance);
   }
-  else{
-    //
+  else {
+    // น้ำไม่หมด
   }
 }
+int getWaterLevel() {
+  int distance = hc.dist();
+  return distance;
+}
+int getSoilMoistureLevel() {
+  int moisture = analogRead(SOIL_PIN); // read the analog value from sensor
+  return moisture;
+}
 void loop() {
-  lcd();
-  DHT();
-  soi_moisture_and_rod_nam();
-  water();
+  // dht
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  // soil sensor
+  int moisture = getSoilMoistureLevel();
+  Serial.print("Moisture in soil value: ");
+  Serial.println(moisture);
+  // distance sensor
+  int waterLevel = getWaterLevel();
+  //
+  updateLcd(moisture);
+  updateBlynk(temperature,humidity);
+  checkRodNam(moisture);
+  checkWater(waterLevel);
   delay(100);
   Blynk.run();
 }
