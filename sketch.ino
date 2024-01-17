@@ -38,10 +38,10 @@ void lcd() {
   //LINE.notifyPicture("uto kawaii","https://cdn.discordapp.com/attachments/1138409352777175150/1188863197151776828/GBOOGKHawAALsGz.jfif?ex=659c1222&is=65899d22&hm=4fff9989b9c2c766ddf79ba549247abfa939ae32417bf16259d9f0b76512031c&");
 }
 
-void updateLcd(int moisture) {//lcd show soi mois,temp
+void updateLcd(int moisture) {//lcd show soil moisture,temp
   lcd.setCursor(0, 0);
   lcd.print("Moisture : "); 
-  lcd.print(misture);o
+  lcd.print(moisture);
   lcd.print("        "); 
   delay(100);
   lcd.setCursor(0, 1);
@@ -88,7 +88,7 @@ void loop() {
   float humidity = dht.readHumidity();
   // soil sensor
   int moisture = getSoilMoistureLevel();
-  Serial.print("Moisture in soi value: ");
+  Serial.print("Moisture in soil value: ");
   Serial.println(moisture);
   // distance sensor
   int waterLevel = getWaterLevel();
