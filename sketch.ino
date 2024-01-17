@@ -71,8 +71,8 @@ void water() {//ดูว่าน้ำจะหมดไหม
   }
 }
 void loop() {
-  DHT()
-  soi_moisture()
+  DHT();
+  soi_moisture();
   water();
   delay(100);
   Blynk.run();
