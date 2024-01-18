@@ -1,3 +1,4 @@
+//ยังไม่ได้เขียน blynk,line
 #define BLYNK_TEMPLATE_ID "TMPL6N_-7GvRl"
 #define BLYNK_TEMPLATE_NAME "Quickstart Template"
 #define BLYNK_AUTH_TOKEN "..................."
@@ -156,3 +157,4 @@ void loop() {
   delay(100);
   Blynk.run();
 }
+//ยังไม่ได้เขียน blynk,line
