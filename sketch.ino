@@ -1,4 +1,3 @@
-
 #define BLYNK_TEMPLATE_ID "TMPL6N_-7GvRl"
 #define BLYNK_TEMPLATE_NAME "Quickstart Template"
 #define BLYNK_AUTH_TOKEN "..................."
@@ -10,18 +9,42 @@
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 
+
 #include <DHT.h>
 #define DHTPIN 15   // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT sensor type
 DHT dht(DHTPIN, DHTTYPE);
+
+#define LDR_PIN 2
+int val_ldr;
+
+#include <Adafruit_NeoPixel.h>
+#define Neo_PIN 34	 // input pin Neopixel is attached to
+#define NUMPIXELS 35 // number of neopixels in Ring
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+int delayval = 100; // timing delay
+int redColor = 0;
+int greenColor = 0;
+int blueColor = 0;
+
+
 #define SOI_PIN 4
+#define Relay1 14
 
 #define SSID "Wokwi-GUEST"               
 #define PASSWORD ""                      
 #define LINE_TOKEN "......................"      
 LiquidCrystal lcd(12, 13, 16, 17, 18, 19);
 HCSR04 hc(23, 22); //tric,echo
+
 void setup() {
+  pinMode(LDR_PIN,INPUT);
+  pinMode(SOI_PIN,INPUT);
+  pinMode(Relay1, OUTPUT);
+  
+  dht.begin();
+  pixels.begin();
+
   lcd.begin(16, 2);
   Serial.begin(115200);
   Blynk.begin(BLYNK_AUTH_TOKEN, SSID, PASSWORD);
@@ -37,6 +60,10 @@ void setup() {
   //LINE.notify("Hello from ESP32 on Wokwi!");
   //LINE.notifyPicture("สวัสดีวันอังคาร","https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjT21_Z_eLPyjFuRQDzJiN9hGFsRHeatpgeDj47T93t93MV3BvROSx6c4Tku-dWEKFaVadWRSWHl9MPEo3ErxqoTv9fT4jHt8v8CZ4aXVfCL86oBroodOgN3xciMB8ffO_y7T-Ob2TUj-AxcWsDPcnmxnRFNUiKZqgOO5H3Gcp3A5W3taHgoBFoL63cUg/s2093/1684132556354.jpg");
   //LINE.notifyPicture("uto kawaii","https://cdn.discordapp.com/attachments/1138409352777175150/1188863197151776828/GBOOGKHawAALsGz.jfif?ex=659c1222&is=65899d22&hm=4fff9989b9c2c766ddf79ba549247abfa939ae32417bf16259d9f0b76512031c&");
+}
+void ldr(){
+  val_ldr = map(analogRead(LDR_PIN),32,4063,1,255);
+  Serial.println(val_ldr);
 }
 void DHT() { //อุณหภูมิในอากาศ เขียนไม่เป็น
   //dht
@@ -69,9 +96,50 @@ void water() {//ดูว่าน้ำจะหมดไหม
     //
   }
 }
+
+void setcolor(){
+  if(get3==0){  //none
+    redColor = 0;
+    greenColor = 0;
+    blueColor = 0;
+    for(int i=0;i<NUMPIXELS;i++){
+      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+      pixels.setPixelColor(i, pixels.Color(redColor, greenColor, blueColor)); // Moderately bright green color.
+      pixels.show(); // This sends the updated pixel color to the hardware.
+      //delay(delayval); // Delay for a period of time (in milliseconds).
+      // Serial.println(i);
+    }
+  }
+  if(get3==1){  //purple
+    redColor = 169;
+    greenColor = 49;
+    blueColor = 253;
+    for(int i=0;i<NUMPIXELS;i++){
+      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+      pixels.setPixelColor(i, pixels.Color(redColor, greenColor, blueColor)); // Moderately bright green color.
+      pixels.show(); // This sends the updated pixel color to the hardware.
+      //delay(delayval); // Delay for a period of time (in milliseconds).
+      // Serial.println(i);
+    }
+  }
+  if(get3==2){  //yellow
+    redColor = 249;
+    greenColor = 255;
+    blueColor = 169;
+    for(int i=0;i<NUMPIXELS;i++){
+      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+      pixels.setPixelColor(i, pixels.Color(redColor, greenColor, blueColor)); // Moderately bright green color.
+      pixels.show(); // This sends the updated pixel color to the hardware.
+      //delay(delayval); // Delay for a period of time (in milliseconds).
+      // Serial.println(i);
+    }
+  }
+} 
 void loop() {
+  ldr();
   DHT();
   soi_moisture_and_rod_nam();
+  setcolor();
   
   lcd.setCursor(0, 0);
   lcd.print("Moisture : "); 
@@ -84,7 +152,7 @@ void loop() {
   lcd.print("        "); 
   delay(100);
 
-  water();
+  water();//check water
   delay(100);
   Blynk.run();
 }
