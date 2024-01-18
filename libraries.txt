@@ -6,3 +6,4 @@ HCSR04 ultrasonic sensor
 Blynk
 DHT sensor library
 LiquidCrystal
+Adafruit NeoPixel
