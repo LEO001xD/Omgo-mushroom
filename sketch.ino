@@ -21,7 +21,7 @@ DHT dht(DHTPIN, DHTTYPE);
 #define LINE_TOKEN "......................"      
 LiquidCrystal lcd(12, 13, 16, 17, 18, 19);
 HCSR04 hc(23, 22); //tric,echo
-void lcd() {
+void setup() {
   lcd.begin(16, 2);
   Serial.begin(115200);
   Blynk.begin(BLYNK_AUTH_TOKEN, SSID, PASSWORD);
