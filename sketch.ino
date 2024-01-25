@@ -1,7 +1,9 @@
+//not finish
 //ยังไม่ได้เขียน blynk,line
-#define BLYNK_TEMPLATE_ID "TMPL6N_-7GvRl"
-#define BLYNK_TEMPLATE_NAME "Quickstart Template"
-#define BLYNK_AUTH_TOKEN "..................."
+#define BLYNK_TEMPLATE_ID "TMPL6sbgFAXW0"
+#define BLYNK_TEMPLATE_NAME "Project"
+#define BLYNK_AUTH_TOKEN "MbXFGvPOOno5ZqH50ziatY0nMDaQ4mFa"
+int get3;
 
 #include <TridentTD_LineNotify.h>
 #include <WiFi.h>
@@ -9,7 +11,7 @@
 
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
-
+#include <LiquidCrystal.h>
 
 #include <DHT.h>
 #define DHTPIN 15   // Digital pin connected to the DHT sensor
@@ -21,20 +23,19 @@ int val_ldr;
 
 #include <Adafruit_NeoPixel.h>
 #define Neo_PIN 34	 // input pin Neopixel is attached to
-#define NUMPIXELS 35 // number of neopixels in Ring
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+#define NUMPIXELS 12 // number of neopixels in Ring
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, Neo_PIN, NEO_GRB + NEO_KHZ800);
 int delayval = 100; // timing delay
 int redColor = 0;
 int greenColor = 0;
 int blueColor = 0;
 
-
 #define SOI_PIN 4
 #define Relay1 14
 
-#define SSID "Wokwi-GUEST"               
-#define PASSWORD ""                      
-#define LINE_TOKEN "......................"      
+#define SSID "DX100"               
+#define PASSWORD "11111111"                      
+#define LINE_TOKEN "HUZldWYLqry1RakCi7gxmgTzjdxccHUwrrvApBWWs05"      
 LiquidCrystal lcd(12, 13, 16, 17, 18, 19);
 HCSR04 hc(23, 22); //tric,echo
 
@@ -61,6 +62,17 @@ void setup() {
   //LINE.notify("Hello from ESP32 on Wokwi!");
   //LINE.notifyPicture("สวัสดีวันอังคาร","https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjT21_Z_eLPyjFuRQDzJiN9hGFsRHeatpgeDj47T93t93MV3BvROSx6c4Tku-dWEKFaVadWRSWHl9MPEo3ErxqoTv9fT4jHt8v8CZ4aXVfCL86oBroodOgN3xciMB8ffO_y7T-Ob2TUj-AxcWsDPcnmxnRFNUiKZqgOO5H3Gcp3A5W3taHgoBFoL63cUg/s2093/1684132556354.jpg");
   //LINE.notifyPicture("uto kawaii","https://cdn.discordapp.com/attachments/1138409352777175150/1188863197151776828/GBOOGKHawAALsGz.jfif?ex=659c1222&is=65899d22&hm=4fff9989b9c2c766ddf79ba549247abfa939ae32417bf16259d9f0b76512031c&");
+}
+/*
+BLYNK_WRITE(V0)
+{   
+  int get0 = param.asInt();
+}
+*/
+
+BLYNK_WRITE(V3)
+{   
+  get3 = param.asInt();
 }
 void ldr(){
   val_ldr = map(analogRead(LDR_PIN),32,4063,1,255);
@@ -98,7 +110,24 @@ void water() {//ดูว่าน้ำจะหมดไหม
   }
 }
 
-void setcolor(){
+
+void loop() {
+  ldr();
+  DHT();
+  soi_moisture_and_rod_nam();
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Moisture : "); 
+  lcd.print(moisture);
+  lcd.print("        "); 
+  delay(100);
+  lcd.setCursor(0, 1);
+  lcd.print("Temperature : "); // dht ยังไม่เขียน
+  lcd.print(temperature);// dht ยังไม่เขียน
+  lcd.print("        "); 
+  delay(100);
+  
+  water();//check water
   if(get3==0){  //none
     redColor = 0;
     greenColor = 0;
@@ -135,25 +164,6 @@ void setcolor(){
       // Serial.println(i);
     }
   }
-} 
-void loop() {
-  ldr();
-  DHT();
-  soi_moisture_and_rod_nam();
-  setcolor();
-  
-  lcd.setCursor(0, 0);
-  lcd.print("Moisture : "); 
-  lcd.print(moisture);
-  lcd.print("        "); 
-  delay(100);
-  lcd.setCursor(0, 1);
-  lcd.print("Temperature : "); // dht ยังไม่เขียน
-  lcd.print(temperature);// dht ยังไม่เขียน
-  lcd.print("        "); 
-  delay(100);
-
-  water();//check water
   delay(100);
   Blynk.run();
 }
