@@ -141,6 +141,16 @@ void loop() {
   else{
     //
   }
+  lcd.setCursor(0, 0);
+  lcd.print("Moisture : "); 
+  lcd.print(moisture);
+  lcd.print("        "); 
+  delay(100);
+  lcd.setCursor(0, 1);
+  lcd.print("Temperature : "); // dht ยังไม่เขียน
+  lcd.print(temperature);// dht ยังไม่เขียน
+  lcd.print("        "); 
+  delay(100);
 
   DHT();
   ultra();
