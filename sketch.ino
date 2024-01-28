@@ -1,5 +1,4 @@
-//not finish
-//ยังไม่ได้เขียน blynk,line
+
 #define BLYNK_TEMPLATE_ID "TMPL6sbgFAXW0"
 #define BLYNK_TEMPLATE_NAME "Project"
 #define BLYNK_AUTH_TOKEN "MbXFGvPOOno5ZqH50ziatY0nMDaQ4mFa"
@@ -17,6 +16,8 @@ int get3;
 #define DHTPIN 15   // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT sensor type
 DHT dht(DHTPIN, DHTTYPE);
+int moisture;
+float temperature;
 
 #define LDR_PIN 2
 int val_ldr;
@@ -26,9 +27,9 @@ int val_ldr;
 #define NUMPIXELS 12 // number of neopixels in Ring
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, Neo_PIN, NEO_GRB + NEO_KHZ800);
 int delayval = 100; // timing delay
-int redColor = 0;
-int greenColor = 0;
-int blueColor = 0;
+int redColor;
+int greenColor;
+int blueColor;
 
 #define SOI_PIN 4
 #define Relay1 14
@@ -50,7 +51,7 @@ void setup() {
   lcd.begin(16, 2);
   Serial.begin(115200);
   Blynk.begin(BLYNK_AUTH_TOKEN, SSID, PASSWORD);
-  WiFi.begin(SSID, PASSWORD);
+  /*WiFi.begin(SSID, PASSWORD);
   Serial.print("Connecting to WiFi...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -58,17 +59,8 @@ void setup() {
   }
   Serial.println("");
   Serial.println("WiFi connected");
-  LINE.setToken(LINE_TOKEN);
-  //LINE.notify("Hello from ESP32 on Wokwi!");
-  //LINE.notifyPicture("สวัสดีวันอังคาร","https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjT21_Z_eLPyjFuRQDzJiN9hGFsRHeatpgeDj47T93t93MV3BvROSx6c4Tku-dWEKFaVadWRSWHl9MPEo3ErxqoTv9fT4jHt8v8CZ4aXVfCL86oBroodOgN3xciMB8ffO_y7T-Ob2TUj-AxcWsDPcnmxnRFNUiKZqgOO5H3Gcp3A5W3taHgoBFoL63cUg/s2093/1684132556354.jpg");
-  //LINE.notifyPicture("uto kawaii","https://cdn.discordapp.com/attachments/1138409352777175150/1188863197151776828/GBOOGKHawAALsGz.jfif?ex=659c1222&is=65899d22&hm=4fff9989b9c2c766ddf79ba549247abfa939ae32417bf16259d9f0b76512031c&");
+  LINE.setToken(LINE_TOKEN);*/
 }
-/*
-BLYNK_WRITE(V0)
-{   
-  int get0 = param.asInt();
-}
-*/
 
 BLYNK_WRITE(V3)
 {   
@@ -80,7 +72,7 @@ void ldr(){
 }
 void DHT() { //อุณหภูมิในอากาศ เขียนไม่เป็น
   //dht
-  float temperature = dht.readTemperature();
+  temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
   char mix_temp_humi[50];
   sprintf(mix_temp_humi, "Temperature %d \n Humidity %d", temperature ,humidity);
@@ -88,7 +80,7 @@ void DHT() { //อุณหภูมิในอากาศ เขียนไ�
 
 }
 void soi_moisture_and_rod_nam() {//ความขื้นในดิน
-  int moisture = analogRead(SOI_PIN); // read the analog value from sensor
+  moisture = analogRead(SOI_PIN); // read the analog value from sensor
   Serial.print("Moisture in soi value: ");
   Serial.println(moisture);
   delay(500);
@@ -103,7 +95,7 @@ void water() {//ดูว่าน้ำจะหมดไหม
   int distance = hc.dist();
   if (distance <= 20){
     LINE.notify("เติมน้ำ");
-    Blynk.virtualWrite(V3,distance);
+    Blynk.virtualWrite(V1,distance);
   }
   else{
     //
@@ -112,6 +104,7 @@ void water() {//ดูว่าน้ำจะหมดไหม
 
 
 void loop() {
+  Blynk.run();
   ldr();
   DHT();
   soi_moisture_and_rod_nam();
@@ -165,6 +158,5 @@ void loop() {
     }
   }
   delay(100);
-  Blynk.run();
+  
 }
-//ยังไม่ได้เขียน blynk,line
