@@ -107,7 +107,7 @@ void soi_moisture_and_rod_nam() {//ความขื้นในดิน
   Serial.println(moisture);
   Blynk.virtualWrite(V4,moisture); 
   delay(500);
-  if(moisture<=1000){
+  if(moisture>=1000){
     digitalWrite(Relay1,HIGH);
     } 
   else{
