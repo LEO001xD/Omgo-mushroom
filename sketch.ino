@@ -28,13 +28,13 @@ HCSR04 hc(23, 22);
 #define NUMPIXELS      16 // จำนวน Neopixel ในสตริป
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-#define SOI_PIN 2
+#define SOI_PIN 34
 #define Relay1 14
 
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(12, 13, 16, 17, 18, 19);
 
-#define LDR_PIN 4
+#define LDR_PIN 35
 int val_ldr;
 
 int get3;
