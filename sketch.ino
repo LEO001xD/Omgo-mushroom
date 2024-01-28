@@ -1,16 +1,16 @@
-
 #define BLYNK_TEMPLATE_ID "TMPL6sbgFAXW0"
 #define BLYNK_TEMPLATE_NAME "Project"
 #define BLYNK_AUTH_TOKEN "MbXFGvPOOno5ZqH50ziatY0nMDaQ4mFa"
-int get3;
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
 
 #include <TridentTD_LineNotify.h>
 #include <WiFi.h>
-#include <HCSR04.h> 
 
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
-#include <LiquidCrystal.h>
+#define SSID "DX100"               
+#define PASSWORD "11111111"                      
+#define LINE_TOKEN "HUZldWYLqry1RakCi7gxmgTzjdxccHUwrrvApBWWs05"
+
 
 #include <DHT.h>
 #define DHTPIN 15   // Digital pin connected to the DHT sensor
@@ -18,145 +18,160 @@ int get3;
 DHT dht(DHTPIN, DHTTYPE);
 int moisture;
 float temperature;
+float humidity;
 
-#define LDR_PIN 2
-int val_ldr;
+#include <HCSR04.h>
+HCSR04 hc(23, 22);
 
 #include <Adafruit_NeoPixel.h>
-#define Neo_PIN 34	 // input pin Neopixel is attached to
-#define NUMPIXELS 12 // number of neopixels in Ring
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, Neo_PIN, NEO_GRB + NEO_KHZ800);
-int delayval = 100; // timing delay
-int redColor;
-int greenColor;
-int blueColor;
+#define PIN            13  // พินที่ Neopixel ต่ออยู่
+#define NUMPIXELS      16 // จำนวน Neopixel ในสตริป
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-#define SOI_PIN 4
+#define SOI_PIN 2
 #define Relay1 14
 
-#define SSID "DX100"               
-#define PASSWORD "11111111"                      
-#define LINE_TOKEN "HUZldWYLqry1RakCi7gxmgTzjdxccHUwrrvApBWWs05"      
+#include <LiquidCrystal.h>
 LiquidCrystal lcd(12, 13, 16, 17, 18, 19);
-HCSR04 hc(23, 22); //tric,echo
+
+#define LDR_PIN 4
+int val_ldr;
+
+int get3;
 
 void setup() {
-  pinMode(LDR_PIN,INPUT);
   pinMode(SOI_PIN,INPUT);
   pinMode(Relay1, OUTPUT);
-  
+
+  pinMode(LDR_PIN,INPUT);
+
   dht.begin();
-  pixels.begin();
+  
+  strip.begin();
+  strip.show(); // ตั้งค่าสีเริ่มต้นให้ทุกหลอดเป็น 'ปิด'
 
   lcd.begin(16, 2);
-  Serial.begin(115200);
+  
   Blynk.begin(BLYNK_AUTH_TOKEN, SSID, PASSWORD);
-  /*WiFi.begin(SSID, PASSWORD);
-  Serial.print("Connecting to WiFi...");
+
+  WiFi.begin(SSID, PASSWORD);
+  Serial.printf("WiFi connecting to %s\n",  SSID);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
     Serial.print(".");
+    delay(400);
   }
+  //Serial.printf("\nWiFi connected\nIP : ");
+  //Serial.println(WiFi.localIP());
   Serial.println("");
   Serial.println("WiFi connected");
-  LINE.setToken(LINE_TOKEN);*/
-}
 
-BLYNK_WRITE(V3)
-{   
-  get3 = param.asInt();
+  LINE.setToken(LINE_TOKEN);
+  LINE.notify("line work");
+  
+  Serial.begin(115200);
 }
-void ldr(){
-  val_ldr = map(analogRead(LDR_PIN),32,4063,1,255);
-  Serial.println(val_ldr);
-}
-void DHT() { //อุณหภูมิในอากาศ เขียนไม่เป็น
+void DHT() {
   //dht
   temperature = dht.readTemperature();
-  float humidity = dht.readHumidity();
+  humidity = dht.readHumidity();
   char mix_temp_humi[50];
   sprintf(mix_temp_humi, "Temperature %d \n Humidity %d", temperature ,humidity);
-  Blynk.virtualWrite(V2, mix_temp_humi);
 
+  Serial.print("temperature : ");
+  Serial.println(temperature);
+  Blynk.virtualWrite(V2,temperature);
+  Serial.print("humidity :");
+  Serial.println(humidity);
+  
+}
+void ultra() { 
+  int distance = hc.dist();
+  int distance1 = 100-distance;
+  Blynk.virtualWrite(V1,distance1);
+  if (distance >= 20){
+    LINE.notify("เติมน้ำ");
+  }
+  Serial.print("distance :"); //return current distance (cm) in serial
+  Serial.println(distance); //return current distance (cm) in serial
+
+}
+void fillSolidColor(uint32_t color) { //neopixel
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);
+  }
+  strip.show();
 }
 void soi_moisture_and_rod_nam() {//ความขื้นในดิน
   moisture = analogRead(SOI_PIN); // read the analog value from sensor
   Serial.print("Moisture in soi value: ");
   Serial.println(moisture);
+  Blynk.virtualWrite(V4,moisture); 
   delay(500);
-  if(moisture<=80){
+  if(moisture<=1000){
     digitalWrite(Relay1,HIGH);
     } 
   else{
     digitalWrite(Relay1,LOW);
     } 
   }
-void water() {//ดูว่าน้ำจะหมดไหม
-  int distance = hc.dist();
-  if (distance <= 20){
-    LINE.notify("เติมน้ำ");
-    Blynk.virtualWrite(V1,distance);
+void ldr(){
+  val_ldr = (analogRead(LDR_PIN));
+  Serial.print("LDR Sun :");
+  Serial.println(val_ldr);
+}
+
+BLYNK_WRITE(V3) {
+  get3 = param.asInt();
+}
+
+void loop() {
+  Blynk.run();
+  soi_moisture_and_rod_nam();
+  ldr();
+
+  if(get3==0){
+    fillSolidColor(strip.Color(0, 0, 0)); // turn off
+  }
+  else if(get3==1){
+    fillSolidColor(strip.Color(55, 10, 255)); // black light
+  }
+  else if(get3==2){
+    fillSolidColor(strip.Color(255, 255, 0)); // yellow
   }
   else{
     //
   }
-}
 
-
-void loop() {
-  Blynk.run();
-  ldr();
   DHT();
-  soi_moisture_and_rod_nam();
-  
-  lcd.setCursor(0, 0);
-  lcd.print("Moisture : "); 
-  lcd.print(moisture);
-  lcd.print("        "); 
+  ultra();
+
   delay(100);
-  lcd.setCursor(0, 1);
-  lcd.print("Temperature : "); // dht ยังไม่เขียน
-  lcd.print(temperature);// dht ยังไม่เขียน
-  lcd.print("        "); 
-  delay(100);
-  
-  water();//check water
-  if(get3==0){  //none
-    redColor = 0;
-    greenColor = 0;
-    blueColor = 0;
-    for(int i=0;i<NUMPIXELS;i++){
-      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-      pixels.setPixelColor(i, pixels.Color(redColor, greenColor, blueColor)); // Moderately bright green color.
-      pixels.show(); // This sends the updated pixel color to the hardware.
-      //delay(delayval); // Delay for a period of time (in milliseconds).
-      // Serial.println(i);
-    }
-  }
-  if(get3==1){  //purple
-    redColor = 169;
-    greenColor = 49;
-    blueColor = 253;
-    for(int i=0;i<NUMPIXELS;i++){
-      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-      pixels.setPixelColor(i, pixels.Color(redColor, greenColor, blueColor)); // Moderately bright green color.
-      pixels.show(); // This sends the updated pixel color to the hardware.
-      //delay(delayval); // Delay for a period of time (in milliseconds).
-      // Serial.println(i);
-    }
-  }
-  if(get3==2){  //yellow
-    redColor = 249;
-    greenColor = 255;
-    blueColor = 169;
-    for(int i=0;i<NUMPIXELS;i++){
-      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-      pixels.setPixelColor(i, pixels.Color(redColor, greenColor, blueColor)); // Moderately bright green color.
-      pixels.show(); // This sends the updated pixel color to the hardware.
-      //delay(delayval); // Delay for a period of time (in milliseconds).
-      // Serial.println(i);
-    }
-  }
-  delay(100);
-  
 }
+
+/*
+int moisture;
+#define SOI_PIN 2
+#define Relay1 14
+
+void setup() {
+  pinMode(SOI_PIN,INPUT);
+  pinMode(Relay1, OUTPUT);
+  Serial.begin(115200);
+}
+void soi_moisture_and_rod_nam() {//ความขื้นในดิน
+  moisture = analogRead(SOI_PIN); // read the analog value from sensor
+  Serial.print("Moisture in soi value: ");
+  Serial.println(moisture);
+  delay(500);
+  if(moisture<=1000){
+    digitalWrite(Relay1,HIGH);
+    } 
+  else{
+    digitalWrite(Relay1,LOW);
+    } 
+  }
+void loop() {
+  soi_moisture_and_rod_nam();
+  delay(100);
+}
+*/
