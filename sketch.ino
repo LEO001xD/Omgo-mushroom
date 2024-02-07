@@ -1,6 +1,6 @@
 #define BLYNK_TEMPLATE_ID "TMPL6sbgFAXW0"
 #define BLYNK_TEMPLATE_NAME "Project"
-#define BLYNK_AUTH_TOKEN "MbXFGvPOOno5ZqH50ziatY0nMDaQ4mFa"
+#define BLYNK_AUTH_TOKEN ""
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 
@@ -9,7 +9,7 @@
 
 #define SSID "Napat.bike"               
 #define PASSWORD "tqhp8222"                      
-#define LINE_TOKEN "HUZldWYLqry1RakCi7gxmgTzjdxccHUwrrvApBWWs05"
+#define LINE_TOKEN ""
 
 
 #include <DHT.h>
