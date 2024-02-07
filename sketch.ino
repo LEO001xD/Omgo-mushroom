@@ -68,7 +68,7 @@ void setup() {
 
   LINE.setToken(LINE_TOKEN);
   LINE.notify("line work");
-  
+  LINE.notifyPicture("https://cdn.discordapp.com/attachments/1196691631307501568/1204732285904224318/image.png?ex=65d5cd5f&is=65c3585f&hm=529883797b6392e8da0a67dc15fdf838c85559d196ff11f8a0f48c56a41d0f49&");
   Serial.begin(115200);
 }
 void DHT() {
@@ -88,7 +88,7 @@ void DHT() {
 void ultra() { 
   long distance = hc.dist();
   //float distance1 = (float)distance/11.0 * 100.0;
-  float distance1 = map(distance,2,11,100,0);
+  float distance1 = map(distance,2,13,100,0);
   Blynk.virtualWrite(V1,distance1);
   if (distance <= 30){
     LINE.notify("เติมน้ำ");
