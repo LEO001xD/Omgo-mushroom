@@ -86,10 +86,11 @@ void DHT() {
   
 }
 void ultra() { 
-  int distance = hc.dist();
-  int distance1 = 100-distance;
+  long distance = hc.dist();
+  //float distance1 = (float)distance/11.0 * 100.0;
+  float distance1 = map(distance,2,11,100,0);
   Blynk.virtualWrite(V1,distance1);
-  if (distance >= 20){
+  if (distance <= 30){
     LINE.notify("เติมน้ำ");
     
   }
@@ -141,6 +142,7 @@ void loop() {
   }
   else{
     //
+    digitalWrite(Relay1,LOW);
   }
 
   if(get3==0){
@@ -151,9 +153,9 @@ void loop() {
   }
   else if(get3==2){
     fillSolidColor(strip.Color(255, 255, 0)); // yellow
-  }
+  }                               
   else{
-    digitalWrite(Relay1,LOW);
+    //digitalWrite(Relay1,LOW);
   }
   char mix_temp_humi[100];
   sprintf(mix_temp_humi, "%d 'C | Humi %d | L %d", temperature ,humidity ,val_ldr);
