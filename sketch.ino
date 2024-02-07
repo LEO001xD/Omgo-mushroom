@@ -77,18 +77,17 @@ void DHT() {
   //dht
   temperature = dht.readTemperature();
   humidity = dht.readHumidity();
-  //char mix_temp_humi[50];
-  //sprintf(mix_temp_humi, "Temperature %d \n Humidity %d", temperature ,humidity);
 
   Serial.print("temperature : ");
   Serial.println(temperature);
-  Blynk.virtualWrite(V2,temperature);
+  
   Serial.print("humidity :");
   Serial.println(humidity);
+  Blynk.virtualWrite(V4,humidity); 
   
 }
 void ultra() { 
-  long distance = hc.dist();
+  float distance = hc.dist();
   //float distance1 = (float)distance/11.0 * 100.0;
   float distance1 = map(distance,2,13,100,0);
   Blynk.virtualWrite(V1,distance1);
@@ -112,7 +111,7 @@ void soi_moisture_and_rod_nam() {//ความขื้นในดิน
   moisture =map(moisture, 2890,1000,0,100);
   Serial.print("Moisture in soi value: ");
   Serial.println(moisture);
-  Blynk.virtualWrite(V4,moisture); 
+  //Blynk.virtualWrite(V4,moisture); 
   delay(500);
   if(humidity<=75){
     digitalWrite(Relay1,HIGH);
@@ -160,8 +159,8 @@ void loop() {
   else{
     //digitalWrite(Relay1,LOW);
   }
-  char mix_temp_humi[100];
-  sprintf(mix_temp_humi, "%.2f 'C | Humi %.2f | L %d", temperature ,humidity ,val_ldr);
+  char mix_temp_humi[150];
+  sprintf(mix_temp_humi, "%.2f 'C | Humi %.2f | L %d | Soil %.2f %%", temperature ,humidity ,val_ldr,moisture);
   Serial.print(mix_temp_humi);
   delay(400);
   Blynk.virtualWrite(V2,mix_temp_humi);
