@@ -7,8 +7,8 @@
 #include <TridentTD_LineNotify.h>
 #include <WiFi.h>
 
-#define SSID "Napat.bike"               
-#define PASSWORD "tqhp8222"                      
+#define SSID ".........."               
+#define PASSWORD ".........."                      
 #define LINE_TOKEN ""
 
 
